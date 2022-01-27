@@ -10,19 +10,17 @@ const app = express();
 //Configurar CORS
 app.use(cors());
 
+//Lectura y parseo del body
+app.use( express.json() );
+
 //Base de Datos
 dbConnection();
 
-console.log( process.env );
-//TIyDv18RaRsIAIiY
-//mean_user
+//console.log( process.env );
+
 //Rutas
-app.get( '/', (request, response) => { 
-    response.json({
-        ok: true,
-        msg: 'Hola Mundo'
-    })
-} );
+app.use('/api/usuarios', require('./routes/usuarios_route.js'));
+app.use('/api/login', require('./routes/auth_route.js'));
 
 app.listen( process.env.PORT , () => {
     console.log('Servidor corriendo en puerto ' + process.env.PORT)
