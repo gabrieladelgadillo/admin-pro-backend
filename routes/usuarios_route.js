@@ -24,4 +24,5 @@ router.put( '/:id', [
         validarCampos,
     ], updateUsuarios);
     router.delete( '/:id', validarJWT, deleteUsuario);
+    
 module.exports = router;

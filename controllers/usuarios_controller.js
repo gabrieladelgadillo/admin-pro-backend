@@ -3,14 +3,31 @@ const encrypt = require('bcryptjs');
 const Usuario = require('../models/usuario');
 const { generarJWT } = require('../helpers/jwt');
 
-const getUsuarios = async(request, res) => { 
+const getUsuarios = async(request, res = response) => { 
 
-    const usuarios = await Usuario.find({}, 'nombre email role google');
+    try {
+        const desde = Number(request.query.desde) || 0;
 
-    res.json({
-        ok: true,
-        usuarios
-    })
+        const [ usuarios, total ] = await Promise.all([
+            Usuario.find({}, 'nombre email role google img')
+                    .skip( desde )
+                    .limit( 5 ),
+            Usuario.count()
+        ])
+
+        res.json({
+            ok: true,
+            usuarios,
+            total
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inseperado... revisar logs.'
+        })
+    }
+    
 }
 
 const createUsuario = async(request, res = response) => { 

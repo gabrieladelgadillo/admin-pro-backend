@@ -19,6 +19,10 @@ dbConnection();
 //console.log( process.env );
 
 //Rutas
+app.use('/api/hospitales', require('./routes/hospitales_route.js'));
+app.use('/api/medicos', require('./routes/medicos_route.js'));
+app.use('/api/todo', require('./routes/busquedas_route.js'));
+app.use('/api/uploads', require('./routes/uploads_route.js'));
 app.use('/api/usuarios', require('./routes/usuarios_route.js'));
 app.use('/api/login', require('./routes/auth_route.js'));
 
