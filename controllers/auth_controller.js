@@ -91,4 +91,26 @@ const googleSignIn = async( request, res = response) => {
     }
 }
 
-module.exports = { login, googleSignIn }
+const renewToken = async(request, res = response) => {
+
+    const uid = request.uid;
+    try{
+
+        //Generar el TOKEN -JWT
+        const token = await generarJWT(uid);
+
+        res.json({
+            ok: true,
+            token
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inseperado... revisar logs.'
+        })
+    }
+}
+
+module.exports = { login, googleSignIn, renewToken }

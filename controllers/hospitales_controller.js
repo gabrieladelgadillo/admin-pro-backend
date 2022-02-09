@@ -1,6 +1,5 @@
 const { response } = require('express');
 const Hospital = require('../models/hospital');
-const { generarJWT } = require('../helpers/jwt');
 
 const getHospitales = async(request, res = response) => { 
 
@@ -58,22 +57,31 @@ const createHospital = async(request, res = response) => {
 
 const updateHospital = async(request, res = response) => {
 
-    // const uid = request.params.id;
+    const id = request.params.id;
+    const uid = request.uid;
 
     try {
 
-        // const usuarioDB = await Usuario.findById(uid);
+        const hospitalDB = await Hospital.findById(id);
 
-        // if (!usuarioDB) {
-        //     return res.status(404).json({
-        //         ok: false,
-        //         msg: 'No existe usuario con ese id.'
-        //     });
-        // }
+        if (!hospitalDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Hospital no encontrado por id.'
+            });
+        }
+
+        //hospitalDB.nombre = request.body.nombre;
+        const cambiosHospital = {
+            ...request.body,
+            usuario: uid
+        }
+
+        const hospitalActualizado = await Hospital.findByIdAndUpdate(id, cambiosHospital, { new: true });
 
         res.json({
             ok: true,
-            msg: 'Se actualizó hospital.'
+            hospital: hospitalActualizado
         });
 
     } catch (error) {
@@ -87,10 +95,35 @@ const updateHospital = async(request, res = response) => {
 }
 
 const deleteHospital = async(request, res = response) => { 
-    res.json({
-        ok: true,
-        msg: 'Se eliminó hospital.'
-    });
+    
+    const id = request.params.id;
+
+    try {
+
+        const hospitalDB = await Hospital.findById(id);
+
+        if (!hospitalDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Hospital no encontrado por id.'
+            });
+        }
+
+        await Hospital.findByIdAndDelete(id);
+
+        res.json({
+            ok: true,
+            msg: "Hospital eliminado."
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inseperado... revisar logs.'
+        })
+
+    }
 }
 
 module.exports = { getHospitales, createHospital, updateHospital, deleteHospital }

@@ -1,6 +1,5 @@
 const { response } = require('express');
 const Medico = require('../models/medico');
-const { generarJWT } = require('../helpers/jwt');
 
 const getMedicos = async(request, res = response) => { 
 
@@ -59,22 +58,30 @@ const createMedico = async(request, res = response) => {
 
 const updateMedico = async(request, res = response) => {
 
-    // const uid = request.params.id;
+    const id = request.params.id;
+    const uid = request.uid;
 
     try {
 
-        // const usuarioDB = await Usuario.findById(uid);
+        const medicoDB = await Medico.findById(id);
 
-        // if (!usuarioDB) {
-        //     return res.status(404).json({
-        //         ok: false,
-        //         msg: 'No existe usuario con ese id.'
-        //     });
-        // }
+        if (!medicoDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Médico no encontrado por id.'
+            });
+        }
+
+        const cambiosMedico = {
+            ...request.body,
+            usuario: uid
+        }
+
+        const medicoActualizado = await Medico.findByIdAndUpdate(id, cambiosMedico, { new: true });
 
         res.json({
             ok: true,
-            msg: 'Se actualizó médico.'
+            medico: medicoActualizado
         });
 
     } catch (error) {
@@ -88,10 +95,35 @@ const updateMedico = async(request, res = response) => {
 }
 
 const deleteMedico = async(request, res = response) => { 
-    res.json({
-        ok: true,
-        msg: 'Se eliminó médico.'
-    });
+    
+    const id = request.params.id;
+
+    try {
+
+        const medicoDB = await Medico.findById(id);
+
+        if (!medicoDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Médico no encontrado por id.'
+            });
+        }
+
+        await Medico.findByIdAndDelete(id);
+
+        res.json({
+            ok: true,
+            msg: "Médico eliminado."
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inseperado... revisar logs.'
+        })
+
+    }
 }
 
 module.exports = { getMedicos, createMedico, updateMedico, deleteMedico }
